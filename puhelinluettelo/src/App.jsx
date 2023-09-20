@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -8,11 +8,12 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('')
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons')
-    .then(response => {
-      setPersons(response.data)
-    })
-  }, [])
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
+  }, [persons])
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -22,9 +23,13 @@ const App = () => {
     }
     const duplicate = persons.find((person) => person.name === newName)
       ? alert(`${newName} is already added to phonebook`)
-      : setPersons(persons.concat(personObject))
-        setNewName('')
-        setNewNumber('')
+      : personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
   }
 
   const handleNameEvent = (event) => {
@@ -36,6 +41,14 @@ const App = () => {
   const handleFilterEvent = (event) => {
     setNewFilter(event.target.value)
   }
+  const handleDelete = id => {
+    personService.erase(id)
+    personService
+      .getAll()
+      .then(updatedPersons => {
+        setPersons(updatedPersons)
+      })
+  }
 
   return (
     <div>
@@ -45,18 +58,21 @@ const App = () => {
       <PersonForm submit={addPerson} handlerName={handleNameEvent} handlerNumber={handleNumberEvent} 
       name={newName} number={newNumber} />
       <h2>Numbers</h2>
-      <Persons allPersons={persons} filterer={newFilter} />
+      {Object.values(persons)
+      .filter(person => person.name.toUpperCase().includes(newFilter.toUpperCase()))
+      .map(filteredPerson => 
+        <Person key={filteredPerson.id} person={filteredPerson} handler={() => handleDelete(filteredPerson.id)} /> 
+      )}
     </div>
   )
 
 }
 
-const Persons = ({ allPersons, filterer }) => {
+const Person = ({ person, handler }) => {
   return (
     <div>
-    {allPersons.filter(person => person.name.toUpperCase().includes(filterer.toUpperCase())).map(filteredPerson => (
-      <p key={filteredPerson.name}>{filteredPerson.name} {filteredPerson.number}</p>
-    ))}
+      {person.name} {person.number}
+      <button key={person.id} onClick={handler}>delete</button>
     </div>
   )
 }
