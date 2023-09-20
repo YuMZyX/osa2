@@ -41,6 +41,7 @@ const App = () => {
   const handleFilterEvent = (event) => {
     setNewFilter(event.target.value)
   }
+  // LISÄÄ POISTON VARMISTAMINEN (Windows.confirm)!!!
   const handleDelete = id => {
     personService.erase(id)
     personService
