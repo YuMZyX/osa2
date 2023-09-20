@@ -7,12 +7,12 @@
     },
     {
       "name": "Ada Lovelace",
-      "number": "44-55-6666",
+      "number": "39-44-5323523",
       "id": 2
     },
     {
       "name": "Dan Abramov",
-      "number": "+361-666555",
+      "number": "12-43-234345",
       "id": 3
     },
     {
@@ -32,18 +32,13 @@
     },
     {
       "name": "Sanna Koskinen",
-      "number": "045-9997777",
+      "number": "045-999888",
       "id": 7
     },
     {
       "name": "Joni Koskinen",
       "number": "040-1122333",
       "id": 8
-    },
-    {
-      "name": "Jorma Uotinen",
-      "number": "050-8888888",
-      "id": 9
     }
   ]
 }

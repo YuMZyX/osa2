@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
+import Person from './components/Person'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [newNotification, setNewNotification] = useState(null)
 
   useEffect(() => {
     personService
@@ -22,14 +27,38 @@ const App = () => {
       number: newNumber
     }
     const duplicate = persons.find((person) => person.name === newName)
-      ? alert(`${newName} is already added to phonebook`)
-      : personService
+    const changedNumber = {...duplicate, number: newNumber}
+    if (duplicate) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(duplicate.id, changedNumber)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== duplicate.id ? person : returnedPerson))
+          })
+        setNewName('')
+        setNewNumber('')
+        setNewNotification(`Changed number of ${newName}`)
+        setTimeout(() => {
+          setNewNotification(null)
+        }, 5000)
+      } else {
+        console.log('Replace cancelled')
+        setNewName('')
+        setNewNumber('')
+      }
+    } else {
+      personService
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+          setNewNotification(`Added ${returnedPerson.name}`)
+          setTimeout(() => {
+            setNewNotification(null)
+          }, 5000)
         })
+    }
   }
 
   const handleNameEvent = (event) => {
@@ -41,19 +70,24 @@ const App = () => {
   const handleFilterEvent = (event) => {
     setNewFilter(event.target.value)
   }
-  // LISÄÄ POISTON VARMISTAMINEN (Windows.confirm)!!!
+  
   const handleDelete = id => {
-    personService.erase(id)
-    personService
-      .getAll()
-      .then(updatedPersons => {
-        setPersons(updatedPersons)
-      })
+    const person = persons.find(p => p.id === id)
+    if (window.confirm(`Delete ${person.name}`)) {
+      personService.erase(id)
+      setNewNotification(`Deleted ${person.name}`)
+      setTimeout(() => {
+        setNewNotification(null)
+      }, 5000)
+    } else {
+      console.log('Deleting person cancelled')
+    }
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={newNotification} />
       <Filter filter={newFilter} handler={handleFilterEvent} />
       <h2>add a new</h2>
       <PersonForm submit={addPerson} handlerName={handleNameEvent} handlerNumber={handleNumberEvent} 
@@ -67,35 +101,6 @@ const App = () => {
     </div>
   )
 
-}
-
-const Person = ({ person, handler }) => {
-  return (
-    <div>
-      {person.name} {person.number}
-      <button key={person.id} onClick={handler}>delete</button>
-    </div>
-  )
-}
-
-const Filter = ({ filter, handler }) => {
-  return (
-    <div>
-      filter shown with <input value={filter} onChange={handler} />
-    </div>
-  )
-}
-
-const PersonForm = ({ submit, handlerName, handlerNumber, name, number }) => {
-  return (
-    <form onSubmit={submit}>
-      <div>name: <input value={name} onChange={handlerName} /></div>
-      <div>number: <input value={number} onChange={handlerNumber} /></div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
 }
 
 export default App
