@@ -4,6 +4,7 @@ import Person from './components/Person'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Notification from './components/Notification'
+import Error from './components/Error'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
   const [newNotification, setNewNotification] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -34,13 +36,21 @@ const App = () => {
           .update(duplicate.id, changedNumber)
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id !== duplicate.id ? person : returnedPerson))
+            setNewName('')
+            setNewNumber('')
+            setNewNotification(`Changed number of ${newName}`)
+            setTimeout(() => {
+              setNewNotification(null)
+            }, 5000)
           })
-        setNewName('')
-        setNewNumber('')
-        setNewNotification(`Changed number of ${newName}`)
-        setTimeout(() => {
-          setNewNotification(null)
-        }, 5000)
+          .catch(error => {
+            setErrorMessage(
+              `Information of ${newName} has already been removed from server`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          })
       } else {
         console.log('Replace cancelled')
         setNewName('')
@@ -88,6 +98,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification message={newNotification} />
+      <Error message={errorMessage} />
       <Filter filter={newFilter} handler={handleFilterEvent} />
       <h2>add a new</h2>
       <PersonForm submit={addPerson} handlerName={handleNameEvent} handlerNumber={handleNumberEvent} 
