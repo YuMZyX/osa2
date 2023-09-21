@@ -5,7 +5,6 @@ import Render from './components/Render'
 function App() {
   const [countries, setCountries] = useState([])
   const [newFilter, setNewFilter] = useState('')
-  const [showCountries, setShowCountries] = useState(false)
 
   useEffect(() => {
     countryService
@@ -19,11 +18,15 @@ function App() {
     setNewFilter(event.target.value)
   }
 
+  const handleShow = (name) => {
+    setNewFilter(name)
+  }
+
   return (
     <div>
       Find countries: <input value={newFilter} onChange={handleFilterEvent} />
       <div>
-        <Render countries={countries} filterer={newFilter} />
+        <Render countries={countries} filterer={newFilter} handler={handleShow} />
       </div>
     </div>
   )
