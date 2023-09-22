@@ -15,7 +15,7 @@ const CountryDetailed = ({ country }) => {
                     <li key={index}>{lang}</li>
                 )}
             </ul>
-            <img src={flags[0]} alt={flags[2]}></img>
+            <div className="imgContainer"><img className="flag" src={flags[0]} alt={flags[2]}></img></div>
             <Weather country={country} />
         </div>
     )

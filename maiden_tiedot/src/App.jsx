@@ -12,7 +12,7 @@ function App() {
       .then(initialCountries => {
         setCountries(initialCountries)
       })
-  }, [countries])
+  }, [newFilter])
 
   const handleFilterEvent = (event) => {
     setNewFilter(event.target.value)
