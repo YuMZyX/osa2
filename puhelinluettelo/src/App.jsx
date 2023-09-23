@@ -20,7 +20,7 @@ const App = () => {
       .then(initialPersons => {
         setPersons(initialPersons)
       })
-  }, [persons])
+  }, [newNotification])
 
   const addPerson = (event) => {
     event.preventDefault()
