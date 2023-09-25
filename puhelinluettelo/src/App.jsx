@@ -67,9 +67,17 @@ const App = () => {
           setTimeout(() => {
             setNewNotification(null)
           }, 5000)
-        })
+      })
+      .catch(error => {
+        const errorMessage = JSON.stringify(error.response.data)
+        setErrorMessage(errorMessage)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      })
     }
   }
+
 
   const handleNameEvent = (event) => {
     setNewName(event.target.value)
